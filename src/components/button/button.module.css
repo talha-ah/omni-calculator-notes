@@ -9,6 +9,12 @@
   cursor: pointer;
 }
 
+.button:disabled {
+  color: #666666;
+  cursor: not-allowed;
+  background-color: #cccccc;
+}
+
 .buttonContainer {
   margin: 15px;
   display: flex;

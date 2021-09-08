@@ -1,7 +1,10 @@
 import { useState, useContext, useEffect } from "react"
+import { useMutation } from "@apollo/client"
 import { useHistory } from "react-router"
 
 import Context from "../../context/notes"
+
+import { deleteNoteGQL, createNoteGQL } from "../../apollo/mutations"
 
 import { Note } from "../../components/notes/notes"
 import { Heading } from "../../components/heading/heading"
@@ -14,43 +17,45 @@ function Notes() {
   const context = useContext(Context)
 
   const [notes, setNotes] = useState([])
-  const [actionLoading, setActionLoading] = useState(false)
+  const [noteId, setNoteId] = useState(null)
+
+  const [addNoteMutation, { data: addData, loading: addLoading }] =
+    useMutation(createNoteGQL)
+  const [deleteNoteMutation, { data: deleteData, loading: deleteLoading }] =
+    useMutation(deleteNoteGQL)
 
   useEffect(() => {
     setNotes(context.notes)
   }, [context.notes])
 
-  const addNote = async (e) => {
+  const preAddNote = async (e) => {
     e.preventDefault()
-    setActionLoading(true)
-
-    let value = e.target.textarea.value
-    let notesArray = [
-      {
-        text: value,
-        date: Date.now(),
-        id: notes.length + 1,
-      },
-      ...notes,
-    ]
-
-    context.setNotes(notesArray)
-    e.target.reset()
-
-    setActionLoading(false)
+    addNoteMutation({ variables: { text: e.target.textarea.value } })
   }
 
-  const deleteNote = async (id) => {
-    setActionLoading(true)
+  useEffect(() => {
+    !addLoading && addData && postAddNote()
+    // eslint-disable-next-line
+  }, [addLoading])
 
-    context.setNotes(notes.filter((e) => e.id !== id))
+  const postAddNote = async (e) => {
+    context.setNotes([addData.createNote, ...notes])
+    document.getElementById("noteform").reset()
+  }
 
-    setActionLoading(false)
+  useEffect(() => {
+    !deleteLoading && deleteData && deleteNote()
+    // eslint-disable-next-line
+  }, [deleteLoading])
+
+  const deleteNote = () => {
+    context.setNotes(notes.filter((e) => String(e._id) !== String(noteId)))
+    setNoteId(null)
   }
 
   return (
     <Page>
-      <Form onSubmit={addNote}>
+      <Form id="noteform" onSubmit={preAddNote}>
         <FormItem
           required
           label="Note"
@@ -58,10 +63,7 @@ function Notes() {
           placeholder="Note text"
         />
         <ButtonContainer>
-          <BorderedButton
-            type="submit"
-            text={actionLoading ? "Loading..." : "Add note"}
-          />
+          <BorderedButton type="submit" text="Add note" loading={addLoading} />
         </ButtonContainer>
       </Form>
       <PageContent>
@@ -86,11 +88,17 @@ function Notes() {
         ) : (
           notes.map((n) => (
             <Note
-              key={n.id}
+              key={n._id}
+              _id={n._id}
               text={n.text}
               date={n.date}
-              onDeleteClick={() => deleteNote(n.id)}
-              onDateClick={() => history.push(`/${n.id}`)}
+              deleting={noteId}
+              deleteLoading={deleteLoading}
+              onDateClick={() => history.push(`/${n._id}`)}
+              onDeleteClick={() => {
+                setNoteId(n._id)
+                deleteNoteMutation({ variables: { id: n._id } })
+              }}
             />
           ))
         )}

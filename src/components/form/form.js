@@ -2,7 +2,7 @@ import styles from "./form.module.css"
 
 export function Form(props) {
   return (
-    <form className={styles.form} onSubmit={props.onSubmit}>
+    <form className={styles.form} id={props.id} onSubmit={props.onSubmit}>
       {props.children}
     </form>
   )

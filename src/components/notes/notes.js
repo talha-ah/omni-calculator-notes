@@ -15,7 +15,13 @@ export function Note(props) {
         </p>
       </div>
       <div className={styles.noteButtonContainer}>
-        <DangerButton text="Delete note" onClick={props.onDeleteClick} />
+        <DangerButton
+          text="Delete note"
+          onClick={props.onDeleteClick}
+          loading={
+            String(props._id) === String(props.deleting) && props.deleteLoading
+          }
+        />
       </div>
     </div>
   )

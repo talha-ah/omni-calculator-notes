@@ -6,13 +6,14 @@ export function Button(props) {
   return (
     <button
       onClick={props.onClick}
+      disabled={props.loading}
       className={styles.button}
       type={props.type || "button"}
       style={{
         color: colors.text,
       }}
     >
-      {props.text}
+      {props.loading ? "Loading..." : props.text}
     </button>
   )
 }
@@ -21,6 +22,7 @@ export function DangerButton(props) {
   return (
     <button
       onClick={props.onClick}
+      disabled={props.loading}
       className={styles.button}
       type={props.type || "button"}
       style={{
@@ -28,7 +30,7 @@ export function DangerButton(props) {
         backgroundColor: colors.red,
       }}
     >
-      {props.text}
+      {props.loading ? "Loading..." : props.text}
     </button>
   )
 }
@@ -37,6 +39,7 @@ export function BorderedButton(props) {
   return (
     <button
       onClick={props.onClick}
+      disabled={props.loading}
       className={styles.button}
       type={props.type || "button"}
       style={{
@@ -45,7 +48,7 @@ export function BorderedButton(props) {
         border: `1px solid ${colors.border}`,
       }}
     >
-      {props.text}
+      {props.loading ? "Loading..." : props.text}
     </button>
   )
 }

@@ -1,8 +1,12 @@
 import { useParams, useHistory } from "react-router-dom"
 import { useEffect, useState, useContext } from "react"
-import styles from "./note.module.css"
+import { useQuery, useMutation } from "@apollo/client"
 
 import Context from "../../context/notes"
+import styles from "./note.module.css"
+
+import { fetchNoteGQL } from "../../apollo/queries"
+import { deleteNoteGQL } from "../../apollo/mutations"
 
 import { Loader } from "../../components/loader/loader"
 import { NoteSingle } from "../../components/notes/notes"
@@ -15,24 +19,26 @@ function Note() {
   const context = useContext(Context)
 
   const [note, setNote] = useState("")
-  const [loading, setLoading] = useState(true)
-  const [actionLoading, setActionLoading] = useState(false)
+
+  const { data: noteData, loading: noteLoading } = useQuery(fetchNoteGQL, {
+    variables: { id },
+  })
+  const [deleteNote, { data: deleteData, loading: deleteLoading }] =
+    useMutation(deleteNoteGQL)
 
   useEffect(() => {
-    fetchNote()
+    !noteLoading && noteData && setNote({ ...noteData.note })
     // eslint-disable-next-line
-  }, [])
+  }, [noteLoading])
 
-  const fetchNote = async () => {
-    setNote(context.notes.find((e) => String(e.id) === String(id)))
-    setLoading(false)
-  }
+  useEffect(() => {
+    !deleteLoading && deleteData && postDeleteNote()
+    // eslint-disable-next-line
+  }, [deleteLoading])
 
-  const deleteNote = async () => {
-    setActionLoading(true)
-    context.setNotes(context.notes.filter((e) => String(e.id) !== String(id)))
+  const postDeleteNote = () => {
+    context.setNotes(context.notes.filter((e) => String(e._id) !== String(id)))
 
-    setActionLoading(false)
     history.goBack()
   }
 
@@ -43,11 +49,11 @@ function Note() {
           <Button text="Go back" onClick={() => history.goBack()} />
           <DangerButton
             text="Delete note"
-            onClick={deleteNote}
-            loading={actionLoading}
+            loading={deleteLoading}
+            onClick={() => deleteNote({ variables: { id } })}
           />
         </div>
-        {loading ? (
+        {noteLoading ? (
           <Loader />
         ) : (
           <NoteSingle text={note.text} date={note.date} />
