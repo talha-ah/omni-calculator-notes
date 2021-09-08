@@ -1,0 +1,18 @@
+.button {
+  border: 0;
+  font-size: 12px;
+  padding: 5px 15px;
+  border-radius: 2px;
+}
+
+.button:hover {
+  cursor: pointer;
+}
+
+.buttonContainer {
+  margin: 15px;
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+  justify-content: center;
+}

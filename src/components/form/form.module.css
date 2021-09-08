@@ -1,0 +1,30 @@
+.form {
+  width: 100%;
+  max-width: 800px;
+}
+
+.item {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.label {
+  color: #6f7072;
+  margin-left: 5px;
+  font-weight: bold;
+  margin-bottom: 5px;
+}
+
+.input {
+  width: 100%;
+  resize: none;
+  padding: 5px;
+  color: #6f7072;
+  border-radius: 5px;
+  border: 1px solid #dfdfdf;
+}
+
+.input:focus {
+  outline: none !important;
+}
